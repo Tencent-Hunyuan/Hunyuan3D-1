@@ -59,6 +59,10 @@ parser.add_argument("--mv23d_ckt_path", default="weights/svrm/svrm.safetensors",
 parser.add_argument("--text2image_path", default="weights/hunyuanDiT", type=str)
 parser.add_argument("--save_memory", default=False)
 parser.add_argument("--device", default="cuda:0", type=str)
+parser.add_argument(
+    "--server_name", default="127.0.0.1", type=str,
+    help="Address to bind the demo to. Use 0.0.0.0 to explicitly allow network access.",
+)
 args = parser.parse_args()
 
 
@@ -434,6 +438,5 @@ with gr.Blocks() as demo:
     )
 
     demo.queue(max_size=1)
-    demo.launch(server_name='0.0.0.0', server_port=8080)
+    demo.launch(server_name=args.server_name, server_port=8080)
     # demo.launch()
-    

@@ -118,11 +118,9 @@ pip install xformers --index-url https://download.pytorch.org/whl/cu121
 pip install flash_attn
 ```
 
-Most environment errors are caused by a mismatch between machine and packages. You can try manually specifying the version, as shown in the following successful cases:
-```
-# python3.9
-pip install torch==2.0.1 torchvision==0.15.2 --index-url https://download.pytorch.org/whl/cu118 
-```
+排查环境问题时，请匹配 PyTorch、torchvision、CUDA 和编译扩展的版本，避免通过降级到旧版 PyTorch 解决安装问题。
+
+请仅加载可信来源的模型权重。显式设置 `weights_only=True` 可以限制 pickle 加载，但它不是沙箱，也不能替代 PyTorch 的安全更新。`requirements.txt` 中历史固定的 `torch==2.6.0` 受 [CVE-2026-24747](https://github.com/pytorch/pytorch/security/advisories/GHSA-63cw-57p8-fm3p) 影响，该问题在 PyTorch 2.10.0 及以后版本中修复。更新此依赖需要验证配套的 torchvision、CUDA 和编译扩展；不能将该历史版本视为加载不可信权重的安全基线。
 
 when install pytorch3d, the gcc version is preferably greater than 9, and the gpu driver should not be too old.
 
@@ -235,6 +233,7 @@ cd ..
 
 ```bash
 python main.py ... --do_texture_mapping --do_bake (--do_render)
+```
 
 #### Gradio界面部署
 
@@ -250,7 +249,21 @@ python3 app.py --use_lite
 python3 app.py --use_lite --save_memory
 ```
 
-Gradio界面体验地址为 http://0.0.0.0:8080. 这里 0.0.0.0 应当填写运行模型的机器IP地址。
+默认仅监听本机，Gradio 界面访问地址为 http://127.0.0.1:8080。
+
+在容器或远程 GPU 服务器中部署时，可显式指定监听地址：
+
+```shell
+python3 app.py --server_name 0.0.0.0
+```
+
+这会监听所有网卡。任何能够访问 8080 端口的人都可以使用此演示程序，程序本身没有内置认证。开放网络访问时，请通过防火墙或带认证的代理限制访问。远程服务器也可以保留默认监听地址，使用 SSH 端口转发：
+
+```shell
+ssh -L 8080:127.0.0.1:8080 user@your-server
+```
+
+随后在自己的电脑上打开 http://127.0.0.1:8080。
 
 ## 相机参数
 

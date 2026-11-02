@@ -468,6 +468,10 @@ class HunYuan3D_MVD_Std_Pipeline(diffusers.DiffusionPipeline):
     def from_pretrained(cls, pretrained_model_name_or_path, *model_args, **kwargs):
         # uc_text_emb.pt and uc_text_emb_2.pt are inferenced and saved in advance
         pipeline = super().from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
-        pipeline.uc_text_emb = torch.load(os.path.join(pretrained_model_name_or_path, "uc_text_emb.pt"))
-        pipeline.uc_text_emb_2 = torch.load(os.path.join(pretrained_model_name_or_path, "uc_text_emb_2.pt"))
+        pipeline.uc_text_emb = torch.load(
+            os.path.join(pretrained_model_name_or_path, "uc_text_emb.pt"), weights_only=True
+        )
+        pipeline.uc_text_emb_2 = torch.load(
+            os.path.join(pretrained_model_name_or_path, "uc_text_emb_2.pt"), weights_only=True
+        )
         return pipeline

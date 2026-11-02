@@ -46,7 +46,7 @@ class FrozenDinoV2ImageEmbedder(nn.Module):
 
     def load_pretrained(self, ckpt_path):
         print('Loading dinov2 encoder ...')
-        orig_state_dict = torch.load(ckpt_path, map_location='cpu')
+        orig_state_dict = torch.load(ckpt_path, map_location='cpu', weights_only=True)
         try:
             ret = self.model.load_state_dict(orig_state_dict, strict=False)
             print(ret)

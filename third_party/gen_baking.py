@@ -1,4 +1,5 @@
 import os, sys, time
+import shutil
 from typing import List, Optional
 from iopath.common.file_io import PathManager
 
@@ -254,7 +255,7 @@ def back_projection(
 
     bake_dir = os.path.join(dst_dir, 'bake')
     os.makedirs(bake_dir, exist_ok=True)
-    os.system(f'cp {obj_file} {bake_dir}')
+    shutil.copy2(obj_file, bake_dir)
     
     textute_img = Image.fromarray(init_texture.astype(np.uint8))
     textute_img.save(os.path.join(bake_dir, init_texture_file.split("/")[-1]))
@@ -262,8 +263,9 @@ def back_projection(
     mtl_dir = obj_file.replace('.obj', '.mtl')
     if not os.path.exists(mtl_dir): mtl_dir = obj_file.replace("mesh.obj" ,"material.mtl")
     if not os.path.exists(mtl_dir): mtl_dir = obj_file.replace("mesh.obj" ,"texture.mtl")
-    if not os.path.exists(mtl_dir): import ipdb;ipdb.set_trace()
-    os.system(f'cp {mtl_dir} {bake_dir}')
+    if not os.path.exists(mtl_dir):
+        raise FileNotFoundError(f"No material file found for {obj_file}")
+    shutil.copy2(mtl_dir, bake_dir)
 
     # convert .obj to .glb file
     new_obj_pth = os.path.join(bake_dir, obj_file.split('/')[-1])
