@@ -122,11 +122,9 @@ pip install xformers --index-url https://download.pytorch.org/whl/cu121
 pip install flash_attn
 ```
 
-Most environment errors are caused by a mismatch between machine and packages. You can try manually specifying the version, as shown in the following successful cases:
-```
-# python3.9
-pip install torch==2.0.1 torchvision==0.15.2 --index-url https://download.pytorch.org/whl/cu118 
-```
+Match PyTorch, torchvision, CUDA and compiled extensions when resolving environment errors. Avoid downgrading to old PyTorch releases to work around installation issues.
+
+Load model weights only from trusted sources. Explicit `weights_only=True` restricts pickle loading, but it is not a sandbox and does not replace PyTorch security updates. The historical `torch==2.6.0` pin in `requirements.txt` is affected by [CVE-2026-24747](https://github.com/pytorch/pytorch/security/advisories/GHSA-63cw-57p8-fm3p), which is fixed in PyTorch 2.10.0 and later. Updating that pin requires validating the corresponding torchvision, CUDA and compiled extensions; it must not be treated as a safe baseline for untrusted checkpoints.
 
 when install pytorch3d, the gcc version is preferably greater than 9, and the gpu driver should not be too old.
 
@@ -255,7 +253,21 @@ python3 app.py --use_lite
 python3 app.py --use_lite --save_memory
 ```
 
-Then the demo can be accessed through http://0.0.0.0:8080. It should be noted that the 0.0.0.0 here needs to be X.X.X.X with your server IP.
+By default, the demo listens only on the local machine at http://127.0.0.1:8080.
+
+For a container or remote GPU server, explicitly choose the listening address:
+
+```shell
+python3 app.py --server_name 0.0.0.0
+```
+
+This listens on all network interfaces. Anyone who can reach port 8080 can use the demo, which has no built-in authentication. Restrict access with your firewall or an authenticated proxy when enabling network access. For a remote server, you can instead keep the default address and use SSH port forwarding:
+
+```shell
+ssh -L 8080:127.0.0.1:8080 user@your-server
+```
+
+Then open http://127.0.0.1:8080 on your own machine.
 
 ## Camera Parameters
 
